@@ -1,0 +1,3091 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <meta name="theme-color" content="#0D7C66" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Trisya_Bayar - Bayar Tagihan & Pulsa</title>
+
+    <!-- ===== CDN ===== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>" />
+
+    <style>
+        /* ============================================
+           CSS VARIABLES - TEMA HIJAU/TEAL
+           ============================================ */
+        :root {
+            --primary: #0D7C66;
+            --primary-dark: #0A5C4A;
+            --primary-light: #15A884;
+            --primary-gradient: linear-gradient(135deg, #0D7C66 0%, #00B4A0 100%);
+            --secondary: #00B4A0;
+            --secondary-light: #6CD4C4;
+            --accent: #F5A623;
+            --success: #27AE60;
+            --danger: #E74C3C;
+            --warning: #F39C12;
+            --bg-primary: #F0F7F4;
+            --bg-secondary: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A2A3A;
+            --text-secondary: #4A5A6A;
+            --text-light: #FFFFFF;
+            --text-muted: #8A9AAA;
+            --shadow-sm: 0 2px 8px rgba(13, 124, 102, 0.08);
+            --shadow-md: 0 8px 30px rgba(13, 124, 102, 0.12);
+            --shadow-lg: 0 16px 48px rgba(13, 124, 102, 0.18);
+            --shadow-xl: 0 24px 64px rgba(13, 124, 102, 0.25);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-size-base: 16px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0D1A1A;
+            --bg-secondary: #1A2A2A;
+            --bg-card: #1A2A2A;
+            --text-primary: #E8F0F0;
+            --text-secondary: #A0B4B4;
+            --text-muted: #6A7A7A;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: var(--font-size-base);
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 80px;
+            transition: var(--transition);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: var(--radius-full);
+        }
+
+        /* ============================================
+           HEADER - Mobile Optimized
+           ============================================ */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--bg-card);
+            border-bottom: 1px solid rgba(13, 124, 102, 0.08);
+            padding: 8px 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .logo-icon {
+            font-size: 1.2rem;
+        }
+        .logo-text {
+            font-size: 0.85rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .header-saldo {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.6rem;
+            white-space: nowrap;
+        }
+        .header-saldo i {
+            font-size: 0.6rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            min-width: 40px;
+            min-height: 40px;
+            flex-shrink: 0;
+        }
+        .theme-toggle:active {
+            transform: scale(0.92);
+        }
+
+        .profile-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-light);
+            overflow: hidden;
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+            transition: var(--transition);
+            min-width: 40px;
+            min-height: 40px;
+            flex-shrink: 0;
+        }
+        .profile-btn:active {
+            transform: scale(0.92);
+        }
+        .profile-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ============================================
+           MAIN CONTENT - Mobile First
+           ============================================ */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 12px;
+            min-height: calc(100vh - 140px);
+            transition: var(--transition);
+        }
+
+        /* ============================================
+           BOTTOM NAV - Mobile Optimized
+           ============================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-card);
+            border-top: 1px solid rgba(13, 124, 102, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 4px 0 8px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: var(--transition);
+            position: relative;
+            font-family: var(--font-family);
+            min-height: 40px;
+            min-width: 40px;
+            border-radius: var(--radius-md);
+            flex: 1;
+        }
+        .nav-item i {
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            border-radius: 0 0 var(--radius-full) var(--radius-full);
+            transition: var(--transition);
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-item.active::after {
+            width: 50%;
+        }
+        .nav-item.active i {
+            transform: translateY(-1px);
+        }
+        .nav-item:active {
+            transform: scale(0.92);
+        }
+
+        /* ============================================
+           SECTION
+           ============================================ */
+        .section {
+            display: none;
+            animation: fadeSlideUp 0.35s ease forwards;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================
+           CARDS - Mobile Optimized
+           ============================================ */
+        .card-modern {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(13, 124, 102, 0.06);
+            transition: var(--transition);
+            margin-bottom: 12px;
+        }
+        .card-modern .card-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* ============================================
+           SALDO CARD - Mobile Hero
+           ============================================ */
+        .saldo-card {
+            background: var(--primary-gradient);
+            border-radius: var(--radius-lg);
+            padding: 18px 16px;
+            color: var(--text-light);
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .saldo-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .saldo-card::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .saldo-card .saldo-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        .saldo-card .saldo-amount {
+            font-size: 1.6rem;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.5px;
+            word-break: break-word;
+        }
+        .saldo-card .saldo-user {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            margin-top: 2px;
+        }
+
+        /* ============================================
+           QUICK ACCESS - Mobile Grid
+           ============================================ */
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .quick-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: var(--bg-card);
+            padding: 10px 4px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(13, 124, 102, 0.06);
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text-primary);
+            min-height: 64px;
+            box-shadow: var(--shadow-sm);
+        }
+        .quick-item:active {
+            transform: scale(0.95);
+        }
+        .quick-item .icon-wrap {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--text-light);
+            flex-shrink: 0;
+        }
+        .quick-item .icon-wrap.green {
+            background: var(--primary-gradient);
+        }
+        .quick-item .icon-wrap.teal {
+            background: linear-gradient(135deg, #00B4A0, #008A7A);
+        }
+        .quick-item .icon-wrap.gold {
+            background: linear-gradient(135deg, #F5A623, #F39C12);
+        }
+        .quick-item .icon-wrap.purple {
+            background: linear-gradient(135deg, #6C2BD9, #9B59B6);
+        }
+        .quick-item .quick-label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+
+        /* ============================================
+           PROMO BANNER
+           ============================================ */
+        .promo-banner {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 14px;
+            border: 1px solid rgba(13, 124, 102, 0.06);
+            transition: var(--transition);
+        }
+        .promo-banner .promo-content {
+            padding: 12px 14px;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+        }
+        .promo-banner .promo-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 1px;
+        }
+        .promo-banner .promo-desc {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+        .promo-banner .promo-content+.promo-content {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ============================================
+           FORM - Mobile Optimized
+           ============================================ */
+        .form-modern .form-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+        }
+        .form-modern .form-control {
+            border: 2px solid rgba(13, 124, 102, 0.12);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            width: 100%;
+            min-height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-modern .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 124, 102, 0.12);
+            background: var(--bg-card);
+            outline: none;
+        }
+        .form-modern .form-control.is-invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+        }
+        .form-modern .invalid-feedback {
+            color: var(--danger);
+            font-size: 0.65rem;
+            margin-top: 3px;
+        }
+
+        /* ============================================
+           BUTTONS - Mobile Optimized (min 44px)
+           ============================================ */
+        .btn-primary-custom {
+            background: var(--primary-gradient);
+            border: none;
+            color: var(--text-light);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            cursor: pointer;
+            width: 100%;
+            font-family: var(--font-family);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary-custom:active {
+            transform: scale(0.97);
+        }
+        .btn-primary-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary-custom {
+            background: var(--bg-primary);
+            border: 2px solid rgba(13, 124, 102, 0.12);
+            color: var(--text-secondary);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            cursor: pointer;
+            width: 100%;
+            font-family: var(--font-family);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary-custom:active {
+            transform: scale(0.97);
+        }
+
+        .btn-danger-custom {
+            background: var(--danger);
+            border: none;
+            color: var(--text-light);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            cursor: pointer;
+            font-family: var(--font-family);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-danger-custom:active {
+            transform: scale(0.97);
+        }
+
+        /* ============================================
+           PROVIDER GRID - Mobile
+           ============================================ */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .provider-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: var(--bg-card);
+            padding: 10px 4px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(13, 124, 102, 0.06);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-family);
+            min-height: 56px;
+            box-shadow: var(--shadow-sm);
+        }
+        .provider-item:active {
+            transform: scale(0.95);
+        }
+        .provider-item.selected {
+            border-color: var(--primary);
+            background: rgba(13, 124, 102, 0.06);
+        }
+        .provider-item .provider-icon {
+            font-size: 1.2rem;
+        }
+        .provider-item .provider-name {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================
+           NOMINAL GRID - Mobile
+           ============================================ */
+        .nominal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .nominal-item {
+            background: var(--bg-card);
+            padding: 8px 4px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(13, 124, 102, 0.06);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-family);
+            min-height: 48px;
+            box-shadow: var(--shadow-sm);
+        }
+        .nominal-item:active {
+            transform: scale(0.95);
+        }
+        .nominal-item.selected {
+            border-color: var(--primary);
+            background: rgba(13, 124, 102, 0.06);
+        }
+        .nominal-item .nominal-value {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+        .nominal-item .nominal-price {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           PAYMENT METHODS - Mobile
+           ============================================ */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .payment-item {
+            background: var(--bg-card);
+            padding: 10px 4px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(13, 124, 102, 0.06);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-family);
+            min-height: 56px;
+            box-shadow: var(--shadow-sm);
+        }
+        .payment-item:active {
+            transform: scale(0.95);
+        }
+        .payment-item.selected {
+            border-color: var(--primary);
+            background: rgba(13, 124, 102, 0.06);
+        }
+        .payment-item .payment-icon {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 1px;
+        }
+        .payment-item .payment-name {
+            font-size: 0.55rem;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           SPP LIST - Mobile
+           ============================================ */
+        .spp-list .spp-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 4px;
+            border-bottom: 1px solid rgba(13, 124, 102, 0.06);
+            transition: var(--transition);
+        }
+        .spp-list .spp-item:active {
+            background: rgba(13, 124, 102, 0.03);
+        }
+        .spp-list .spp-item .spp-check {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+            min-width: 20px;
+        }
+        .spp-list .spp-item .spp-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .spp-list .spp-item .spp-desc {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .spp-list .spp-item .spp-amount {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex-shrink: 0;
+            margin-left: 4px;
+        }
+        .spp-list .spp-item .spp-status {
+            font-size: 0.55rem;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .spp-list .spp-item .spp-status.lunas {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
+        .spp-list .spp-item .spp-status.belum {
+            background: rgba(231, 76, 60, 0.12);
+            color: var(--danger);
+        }
+
+        /* ============================================
+           TOAST - Mobile
+           ============================================ */
+        .toast-container {
+            position: fixed;
+            top: 68px;
+            right: 8px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: 320px;
+            width: calc(100% - 16px);
+        }
+        .toast-custom {
+            background: var(--bg-card);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideInRight 0.35s ease forwards;
+            border-left: 4px solid var(--primary);
+            font-size: 0.8rem;
+        }
+        .toast-custom.hide {
+            animation: slideOutRight 0.3s ease forwards;
+        }
+        .toast-custom.success {
+            border-left-color: var(--success);
+        }
+        .toast-custom.error {
+            border-left-color: var(--danger);
+        }
+        .toast-custom.warning {
+            border-left-color: var(--warning);
+        }
+        .toast-custom .toast-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .toast-custom .toast-message {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        .toast-custom .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0 2px;
+            min-width: 30px;
+            min-height: 30px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* ============================================
+           LOADING
+           ============================================ */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        .spinner-custom {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--secondary-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loading-text {
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ============================================
+           MODAL - Mobile
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 9998;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-custom {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-lg);
+            max-width: 480px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 18px 16px;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.35s ease;
+            border: 1px solid rgba(13, 124, 102, 0.06);
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal-custom .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(13, 124, 102, 0.06);
+        }
+        .modal-custom .modal-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+        .modal-custom .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-custom .modal-close:active {
+            transform: scale(0.9);
+        }
+        .modal-custom .modal-footer {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .modal-custom .modal-footer .btn {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        /* ============================================
+           TABLE - Mobile
+           ============================================ */
+        .table-modern {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.65rem;
+        }
+        .table-modern th {
+            text-align: left;
+            padding: 6px 4px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid rgba(13, 124, 102, 0.06);
+            font-size: 0.6rem;
+        }
+        .table-modern td {
+            padding: 6px 4px;
+            border-bottom: 1px solid rgba(13, 124, 102, 0.04);
+            word-break: break-word;
+            font-size: 0.65rem;
+        }
+        .status-badge {
+            font-size: 0.55rem;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-badge.sukses {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
+        .status-badge.gagal {
+            background: rgba(231, 76, 60, 0.12);
+            color: var(--danger);
+        }
+        .status-badge.pending {
+            background: rgba(243, 156, 18, 0.12);
+            color: var(--warning);
+        }
+        .status-badge.lunas {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
+        .status-badge.belum {
+            background: rgba(231, 76, 60, 0.12);
+            color: var(--danger);
+        }
+
+        /* ============================================
+           UTILITY
+           ============================================ */
+        .text-muted-custom {
+            color: var(--text-muted);
+        }
+        .mt-sm {
+            margin-top: 6px;
+        }
+        .mt-md {
+            margin-top: 12px;
+        }
+        .mb-sm {
+            margin-bottom: 6px;
+        }
+        .mb-md {
+            margin-bottom: 12px;
+        }
+        .w-100 {
+            width: 100%;
+        }
+        .d-none {
+            display: none !important;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .fw-bold {
+            font-weight: 700;
+        }
+        .fw-600 {
+            font-weight: 600;
+        }
+        .gap-sm {
+            gap: 6px;
+        }
+
+        /* ============================================
+           PRINT
+           ============================================ */
+        @media print {
+            .bottom-nav,
+            .app-header,
+            .no-print {
+                display: none !important;
+            }
+            .main-content {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            .saldo-card {
+                background: #0D7C66 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .card-modern {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                break-inside: avoid;
+            }
+            .modal-overlay {
+                position: static !important;
+                background: none !important;
+                backdrop-filter: none !important;
+                padding: 0 !important;
+            }
+            .modal-custom {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                max-width: 100% !important;
+                animation: none !important;
+                border-radius: 0 !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 16px !important;
+            }
+            .table-modern td,
+            .table-modern th {
+                border-color: #ddd !important;
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE - MOBILE FIRST
+           ============================================ */
+
+        /* Mobile S (320px - 374px) */
+        @media (max-width: 374px) {
+            .quick-access {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .provider-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .nominal-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .payment-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header-saldo {
+                font-size: 0.5rem;
+                padding: 3px 6px;
+            }
+            .header-saldo i {
+                font-size: 0.5rem;
+            }
+            .logo-text {
+                font-size: 0.75rem;
+            }
+            .logo-icon {
+                font-size: 1rem;
+            }
+            .saldo-card .saldo-amount {
+                font-size: 1.3rem;
+            }
+            .nav-item {
+                font-size: 0.45rem;
+                padding: 3px 4px;
+                min-height: 36px;
+                min-width: 32px;
+            }
+            .nav-item i {
+                font-size: 0.9rem;
+            }
+            .quick-item .icon-wrap {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85rem;
+            }
+            .quick-item {
+                min-height: 56px;
+                padding: 8px 4px;
+            }
+            .quick-item .quick-label {
+                font-size: 0.5rem;
+            }
+        }
+
+        /* Mobile M (375px - 424px) - Default sudah di atas */
+
+        /* Mobile L (425px - 767px) */
+        @media (min-width: 425px) {
+            .quick-access {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .provider-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .nominal-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .payment-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .saldo-card .saldo-amount {
+                font-size: 1.8rem;
+            }
+            .saldo-card {
+                padding: 20px 18px;
+            }
+        }
+
+        /* Tablet (768px - 1023px) */
+        @media (min-width: 768px) {
+            :root {
+                --font-size-base: 15px;
+            }
+            .main-content {
+                padding: 16px 28px;
+            }
+            .header-saldo {
+                font-size: 0.7rem;
+                padding: 4px 14px;
+            }
+            .saldo-card .saldo-amount {
+                font-size: 2rem;
+            }
+            .bottom-nav {
+                padding: 6px 0 10px;
+                max-width: 600px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                border: 1px solid rgba(13, 124, 102, 0.06);
+                border-bottom: none;
+            }
+            .nav-item {
+                font-size: 0.6rem;
+                flex-direction: row;
+                gap: 6px;
+                padding: 6px 14px;
+                border-radius: var(--radius-full);
+                flex: 0 1 auto;
+            }
+            .nav-item i {
+                font-size: 0.9rem;
+            }
+            .nav-item::after {
+                display: none;
+            }
+            .nav-item.active {
+                background: rgba(13, 124, 102, 0.1);
+            }
+            .quick-access {
+                gap: 10px;
+            }
+            .provider-grid {
+                gap: 10px;
+            }
+            .nominal-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            .payment-grid {
+                gap: 10px;
+            }
+            .toast-container {
+                top: 80px;
+                right: 20px;
+                max-width: 380px;
+            }
+        }
+
+        /* Desktop (1024px+) */
+        @media (min-width: 1024px) {
+            :root {
+                --font-size-base: 16px;
+            }
+            .main-content {
+                padding: 24px 40px;
+            }
+            .saldo-card .saldo-amount {
+                font-size: 2.4rem;
+            }
+            .bottom-nav {
+                max-width: 640px;
+                border-radius: var(--radius-xl);
+                margin-bottom: 16px;
+                border: 1px solid rgba(13, 124, 102, 0.06);
+            }
+            .toast-container {
+                top: 90px;
+                right: 24px;
+            }
+            .quick-access {
+                gap: 14px;
+            }
+            .provider-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 12px;
+            }
+            .nominal-grid {
+                gap: 10px;
+            }
+            .payment-grid {
+                gap: 14px;
+            }
+            .modal-overlay {
+                align-items: center;
+            }
+            .modal-custom {
+                border-radius: var(--radius-lg);
+            }
+        }
+
+        /* Touch friendly - semua elemen interaktif minimal 44px */
+        button,
+        .clickable,
+        [onclick],
+        .nav-item,
+        .quick-item,
+        .provider-item,
+        .nominal-item,
+        .payment-item,
+        .spp-check {
+            touch-action: manipulation;
+        }
+
+        /* Smooth scrolling di iOS */
+        @supports (-webkit-overflow-scrolling: touch) {
+            .modal-custom {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Safe area untuk notched phones */
+        @supports (padding: max(0px)) {
+            .app-header {
+                padding-top: max(8px, env(safe-area-inset-top));
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+            .bottom-nav {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+            }
+            .main-content {
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================ -->
+    <!-- HEADER -->
+    <!-- ============================================ -->
+    <header class="app-header" id="appHeader">
+        <div class="header-container">
+            <div class="logo" onclick="navigateTo('dashboard')" style="cursor:pointer">
+                <span class="logo-icon">💳</span>
+                <span class="logo-text">Trisya_Bayar</span>
+            </div>
+            <div class="header-right">
+                <div class="header-saldo">
+                    <i class="fas fa-wallet"></i>
+                    <span id="saldoDisplay">Rp 15.000.000</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="profile-btn" id="profileBtn" aria-label="Profil">
+                    <img src="https://ui-avatars.com/api/?name=Trisya+Maharani&size=32&background=0D7C66&color=fff&font-size=0.5" alt="Profile" />
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================================ -->
+    <main class="main-content" id="mainContent">
+        <div id="contentContainer"></div>
+    </main>
+
+    <!-- ============================================ -->
+    <!-- BOTTOM NAV -->
+    <!-- ============================================ -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-section="dashboard" aria-label="Dashboard">
+            <i class="fas fa-home"></i>
+            <span>Beranda</span>
+        </button>
+        <button class="nav-item" data-section="tagihan" aria-label="Bayar Tagihan">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bayar</span>
+        </button>
+        <button class="nav-item" data-section="spp" aria-label="Biaya Kuliah">
+            <i class="fas fa-graduation-cap"></i>
+            <span>SPP</span>
+        </button>
+        <button class="nav-item" data-section="pulsa" aria-label="Isi Pulsa">
+            <i class="fas fa-sim-card"></i>
+            <span>Pulsa</span>
+        </button>
+        <button class="nav-item" data-section="riwayat" aria-label="Riwayat">
+            <i class="fas fa-clock-rotate-left"></i>
+            <span>Riwayat</span>
+        </button>
+    </nav>
+
+    <!-- ============================================ -->
+    <!-- TOAST CONTAINER -->
+    <!-- ============================================ -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ============================================ -->
+    <!-- MODAL CONTAINER -->
+    <!-- ============================================ -->
+    <div id="modalContainer"></div>
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================================
+        // 1. DATA SIMULASI - Trisya_Bayar
+        // ============================================================
+
+        const userData = {
+            name: "Trisya Maharani",
+            email: "trisya@student.edu",
+            nim: "202401012345",
+            major: "Teknik Informatika",
+            semester: 5,
+            saldo: 15000000,
+            profileImage: "https://ui-avatars.com/api/?name=Trisya+Maharani&size=128&background=0D7C66&color=fff&font-size=0.5",
+            joinedDate: "2024-08-01"
+        };
+
+        const plnData = {
+            "123456789012": { id: "123456789012", name: "Bapak Ahmad Subagyo", address: "Jl. Merdeka No. 45, Menteng, Jakarta Pusat",
+                period: "Juli 2026", amount: 245000, fine: 0, total: 245000, dueDate: "20 Juli 2026", daya: "900 VA",
+                status: "Belum Bayar" },
+            "234567890123": { id: "234567890123", name: "Ibu Siti Rahayu", address: "Jl. Sudirman No. 78, Jakarta Selatan",
+                period: "Juli 2026", amount: 187500, fine: 2500, total: 190000, dueDate: "18 Juli 2026", daya: "450 VA",
+                status: "Belum Bayar" },
+            "345678901234": { id: "345678901234", name: "Bapak Budi Santoso", address: "Jl. Gatot Subroto No. 12, Jakarta Selatan",
+                period: "Juli 2026", amount: 523000, fine: 0, total: 523000, dueDate: "25 Juli 2026", daya: "1300 VA",
+                status: "Belum Bayar" },
+            "456789012345": { id: "456789012345", name: "Ibu Dewi Anggraeni", address: "Jl. Thamrin No. 23, Jakarta Pusat",
+                period: "Juni 2026", amount: 432000, fine: 10800, total: 442800, dueDate: "10 Juni 2026", daya: "2200 VA",
+                status: "Lunas" },
+            "567890123456": { id: "567890123456", name: "Bapak Eko Prasetyo", address: "Jl. Pajajaran No. 56, Bogor",
+                period: "Juli 2026", amount: 315000, fine: 0, total: 315000, dueDate: "22 Juli 2026", daya: "1200 VA",
+                status: "Belum Bayar" }
+        };
+
+        const pdamData = {
+            "678901234567": { id: "678901234567", name: "Bapak Ahmad Subagyo", address: "Jl. Merdeka No. 45, Jakarta Pusat",
+                period: "Juni - Juli 2026", amount: 185000, fine: 0, total: 185000, dueDate: "15 Juli 2026",
+                meterReading: "Awal: 0452, Akhir: 0468", status: "Belum Bayar" },
+            "789012345678": { id: "789012345678", name: "Ibu Siti Rahayu", address: "Jl. Sudirman No. 78, Jakarta Selatan",
+                period: "Juni - Juli 2026", amount: 210000, fine: 5000, total: 215000, dueDate: "12 Juli 2026",
+                meterReading: "Awal: 0891, Akhir: 0915", status: "Belum Bayar" },
+            "890123456789": { id: "890123456789", name: "Bapak Budi Santoso", address: "Jl. Gatot Subroto No. 12, Jakarta Selatan",
+                period: "Juni - Juli 2026", amount: 95000, fine: 0, total: 95000, dueDate: "20 Juli 2026",
+                meterReading: "Awal: 0234, Akhir: 0243", status: "Lunas" }
+        };
+
+        const internetData = {
+            "901234567890": { id: "901234567890", name: "Bapak Ahmad Subagyo", address: "Jl. Merdeka No. 45, Jakarta Pusat",
+                provider: "IndiHome", package: "IndiHome 100Mbps", period: "Juli 2026", amount: 375000, fine: 0,
+                total: 375000, dueDate: "10 Juli 2026", status: "Belum Bayar" },
+            "012345678901": { id: "012345678901", name: "Ibu Dewi Anggraeni", address: "Jl. Thamrin No. 23, Jakarta Pusat",
+                provider: "MyRepublic", package: "MyRepublic 200Mbps", period: "Juli 2026", amount: 550000, fine: 25000,
+                total: 575000, dueDate: "5 Juli 2026", status: "Lunas" },
+            "123450987654": { id: "123450987654", name: "Bapak Eko Prasetyo", address: "Jl. Pajajaran No. 56, Bogor",
+                provider: "Biznet", package: "Biznet 150Mbps", period: "Juli 2026", amount: 420000, fine: 0,
+                total: 420000, dueDate: "18 Juli 2026", status: "Belum Bayar" }
+        };
+
+        const seminarData = {
+            "SEM-2026-001": { id: "SEM-2026-001", name: "Bapak Andi Wijaya", event: "Web Development Bootcamp 2026",
+                date: "15 Agustus 2026", amount: 250000, fine: 0, total: 250000, dueDate: "10 Agustus 2026",
+                location: "Gedung Serbaguna, Universitas Trisakti", status: "Belum Bayar" },
+            "SEM-2026-002": { id: "SEM-2026-002", name: "Ibu Rina Kartika", event: "Digital Marketing Summit 2026",
+                date: "22 Agustus 2026", amount: 350000, fine: 15000, total: 365000, dueDate: "18 Agustus 2026",
+                location: "Convention Hall, Grand Indonesia", status: "Belum Bayar" },
+            "SEM-2026-003": { id: "SEM-2026-003", name: "Bapak Denny Setiawan", event: "AI & Machine Learning Conference",
+                date: "5 September 2026", amount: 500000, fine: 0, total: 500000, dueDate: "1 September 2026",
+                location: "Hotel Mulia, Jakarta", status: "Lunas" },
+            "SEM-2026-004": { id: "SEM-2026-004", name: "Ibu Maria Lestari", event: "Startup Founders Meetup 2026",
+                date: "12 September 2026", amount: 180000, fine: 0, total: 180000, dueDate: "8 September 2026",
+                location: "Co-working Space, SCBD", status: "Belum Bayar" },
+            "SEM-2026-005": { id: "SEM-2026-005", name: "Bapak Rudi Hartono", event: "Cybersecurity Workshop 2026",
+                date: "20 September 2026", amount: 425000, fine: 8500, total: 433500, dueDate: "15 September 2026",
+                location: "Gedung Cyber, BSD", status: "Belum Bayar" }
+        };
+
+        // SPP dengan 13 item tagihan
+        const sppData = {
+            "202401012345": {
+                name: "Trisya Maharani",
+                major: "Teknik Informatika",
+                nim: "202401012345",
+                semester: 5,
+                tagihan: [
+                    { id: 1, desc: "Registrasi", amount: 2500000, status: "Lunas", dueDate: "2024-08-01",
+                    paidDate: "2024-07-28" },
+                    { id: 2, desc: "Cicilan 2", amount: 1500000, status: "Lunas", dueDate: "2024-08-15",
+                        paidDate: "2024-08-10" },
+                    { id: 3, desc: "Cicilan 3", amount: 1500000, status: "Lunas", dueDate: "2024-09-15",
+                        paidDate: "2024-09-12" },
+                    { id: 4, desc: "Cicilan 4", amount: 1500000, status: "Lunas", dueDate: "2024-10-15",
+                        paidDate: "2024-10-10" },
+                    { id: 5, desc: "Cicilan 5", amount: 1500000, status: "Lunas", dueDate: "2024-11-15",
+                        paidDate: "2024-11-13" },
+                    { id: 6, desc: "Cicilan 6", amount: 1500000, status: "Belum", dueDate: "2025-02-15",
+                    paidDate: null },
+                    { id: 7, desc: "Cicilan 7", amount: 1500000, status: "Belum", dueDate: "2025-03-15",
+                    paidDate: null },
+                    { id: 8, desc: "Cicilan 8", amount: 1500000, status: "Belum", dueDate: "2025-04-15",
+                    paidDate: null },
+                    { id: 9, desc: "UTS", amount: 750000, status: "Belum", dueDate: "2025-02-28", paidDate: null },
+                    { id: 10, desc: "UAS", amount: 750000, status: "Belum", dueDate: "2025-05-15", paidDate: null },
+                    { id: 11, desc: "Praktek", amount: 1000000, status: "Belum", dueDate: "2025-03-30",
+                    paidDate: null },
+                    { id: 12, desc: "Seminar", amount: 500000, status: "Belum", dueDate: "2025-06-15",
+                    paidDate: null },
+                    { id: 13, desc: "Short Course", amount: 1200000, status: "Belum", dueDate: "2025-07-01",
+                        paidDate: null }
+                ]
+            },
+            "202310023456": {
+                name: "Budi Santoso",
+                major: "Sistem Informasi",
+                nim: "202310023456",
+                semester: 4,
+                tagihan: [
+                    { id: 1, desc: "Registrasi", amount: 2800000, status: "Lunas", dueDate: "2023-08-01",
+                        paidDate: "2023-07-30" },
+                    { id: 2, desc: "Cicilan 2", amount: 1800000, status: "Lunas", dueDate: "2023-08-15",
+                        paidDate: "2023-08-12" },
+                    { id: 3, desc: "Cicilan 3", amount: 1800000, status: "Lunas", dueDate: "2023-09-15",
+                        paidDate: "2023-09-10" },
+                    { id: 4, desc: "Cicilan 4", amount: 1800000, status: "Lunas", dueDate: "2023-10-15",
+                        paidDate: "2023-10-14" },
+                    { id: 5, desc: "Cicilan 5", amount: 1800000, status: "Lunas", dueDate: "2023-11-15",
+                        paidDate: "2023-11-11" },
+                    { id: 6, desc: "Cicilan 6", amount: 1800000, status: "Lunas", dueDate: "2024-02-15",
+                        paidDate: "2024-02-13" },
+                    { id: 7, desc: "Cicilan 7", amount: 1800000, status: "Lunas", dueDate: "2024-03-15",
+                        paidDate: "2024-03-14" },
+                    { id: 8, desc: "Cicilan 8", amount: 1800000, status: "Belum", dueDate: "2024-04-15",
+                    paidDate: null },
+                    { id: 9, desc: "UTS", amount: 900000, status: "Belum", dueDate: "2024-02-28", paidDate: null },
+                    { id: 10, desc: "UAS", amount: 900000, status: "Belum", dueDate: "2024-05-15", paidDate: null },
+                    { id: 11, desc: "Praktek", amount: 1200000, status: "Belum", dueDate: "2024-03-30",
+                    paidDate: null },
+                    { id: 12, desc: "Seminar", amount: 600000, status: "Belum", dueDate: "2024-06-15",
+                    paidDate: null },
+                    { id: 13, desc: "Short Course", amount: 1500000, status: "Belum", dueDate: "2024-07-01",
+                        paidDate: null }
+                ]
+            },
+            "202210034567": {
+                name: "Dewi Anggraeni",
+                major: "Teknik Elektro",
+                nim: "202210034567",
+                semester: 6,
+                tagihan: [
+                    { id: 1, desc: "Registrasi", amount: 3200000, status: "Lunas", dueDate: "2022-08-01",
+                        paidDate: "2022-07-28" },
+                    { id: 2, desc: "Cicilan 2", amount: 2200000, status: "Lunas", dueDate: "2022-08-15",
+                        paidDate: "2022-08-10" },
+                    { id: 3, desc: "Cicilan 3", amount: 2200000, status: "Lunas", dueDate: "2022-09-15",
+                        paidDate: "2022-09-12" },
+                    { id: 4, desc: "Cicilan 4", amount: 2200000, status: "Lunas", dueDate: "2022-10-15",
+                        paidDate: "2022-10-11" },
+                    { id: 5, desc: "Cicilan 5", amount: 2200000, status: "Lunas", dueDate: "2022-11-15",
+                        paidDate: "2022-11-13" },
+                    { id: 6, desc: "Cicilan 6", amount: 2200000, status: "Lunas", dueDate: "2023-02-15",
+                        paidDate: "2023-02-14" },
+                    { id: 7, desc: "Cicilan 7", amount: 2200000, status: "Lunas", dueDate: "2023-03-15",
+                        paidDate: "2023-03-10" },
+                    { id: 8, desc: "Cicilan 8", amount: 2200000, status: "Lunas", dueDate: "2023-04-15",
+                        paidDate: "2023-04-12" },
+                    { id: 9, desc: "UTS", amount: 1100000, status: "Lunas", dueDate: "2023-02-28",
+                        paidDate: "2023-02-25" },
+                    { id: 10, desc: "UAS", amount: 1100000, status: "Belum", dueDate: "2023-05-15", paidDate: null },
+                    { id: 11, desc: "Praktek", amount: 1500000, status: "Belum", dueDate: "2023-03-30",
+                    paidDate: null },
+                    { id: 12, desc: "Seminar", amount: 700000, status: "Belum", dueDate: "2023-06-15",
+                    paidDate: null },
+                    { id: 13, desc: "Short Course", amount: 1800000, status: "Belum", dueDate: "2023-07-01",
+                        paidDate: null }
+                ]
+            }
+        };
+
+        const providerData = [
+            { id: "telkomsel", name: "Telkomsel", icon: "fa-solid fa-t", color: "#E60000", prefix: ["0811", "0812",
+                    "0813", "0821", "0822", "0852", "0853", "0851"
+                ] },
+            { id: "xl", name: "XL Axiata", icon: "fa-solid fa-x", color: "#0066B3", prefix: ["0817", "0818", "0819",
+                    "0859", "0877", "0878", "0879"
+                ] },
+            { id: "indosat", name: "Indosat", icon: "fa-solid fa-i", color: "#FF6600", prefix: ["0814", "0815", "0816",
+                    "0855", "0856", "0857", "0858"
+                ] },
+            { id: "tri", name: "Tri (3)", icon: "fa-solid fa-3", color: "#FF0000", prefix: ["0895", "0896", "0897",
+                    "0898", "0899"
+                ] },
+            { id: "smartfren", name: "Smartfren", icon: "fa-solid fa-s", color: "#009639", prefix: ["0881", "0882",
+                    "0883", "0884", "0885", "0886", "0887", "0888", "0889"
+                ] },
+            { id: "axis", name: "Axis", icon: "fa-solid fa-a", color: "#FFD700", prefix: ["0831", "0832", "0833",
+                    "0834", "0835", "0836", "0837", "0838", "0839"
+                ] }
+        ];
+
+        const pulsaNominal = [
+            { value: 10000, label: "Rp 10.000", price: 10500 },
+            { value: 25000, label: "Rp 25.000", price: 26000 },
+            { value: 50000, label: "Rp 50.000", price: 51500 },
+            { value: 100000, label: "Rp 100.000", price: 102500 },
+            { value: 200000, label: "Rp 200.000", price: 204000 }
+        ];
+
+        const paketData = [
+            { id: "P1", name: "Paket 1GB", price: 15000, provider: "Telkomsel", masaAktif: "30 Hari" },
+            { id: "P2", name: "Paket 3GB", price: 35000, provider: "Telkomsel", masaAktif: "30 Hari" },
+            { id: "P3", name: "Paket 5GB", price: 50000, provider: "Telkomsel", masaAktif: "30 Hari" },
+            { id: "P4", name: "Paket 10GB", price: 85000, provider: "Telkomsel", masaAktif: "30 Hari" },
+            { id: "P5", name: "Paket 2GB", price: 28000, provider: "XL Axiata", masaAktif: "30 Hari" },
+            { id: "P6", name: "Paket 6GB", price: 58000, provider: "XL Axiata", masaAktif: "30 Hari" },
+            { id: "P7", name: "Paket 12GB", price: 95000, provider: "XL Axiata", masaAktif: "30 Hari" },
+            { id: "P8", name: "Paket 2GB", price: 25000, provider: "Indosat", masaAktif: "30 Hari" },
+            { id: "P9", name: "Paket 4GB", price: 42000, provider: "Indosat", masaAktif: "30 Hari" },
+            { id: "P10", name: "Paket 1.5GB", price: 18000, provider: "Tri (3)", masaAktif: "30 Hari" },
+            { id: "P11", name: "Paket 4.5GB", price: 45000, provider: "Tri (3)", masaAktif: "30 Hari" },
+            { id: "P12", name: "Paket 2GB", price: 22000, provider: "Smartfren", masaAktif: "30 Hari" },
+            { id: "P13", name: "Paket 5GB", price: 48000, provider: "Smartfren", masaAktif: "30 Hari" },
+            { id: "P14", name: "Paket 1GB", price: 12000, provider: "Axis", masaAktif: "30 Hari" },
+            { id: "P15", name: "Paket 3GB", price: 32000, provider: "Axis", masaAktif: "30 Hari" }
+        ];
+
+        const paymentMethods = [
+            { id: "va", name: "Virtual Account", icon: "fa-solid fa-building-columns",
+                description: "Bayar melalui transfer ke Virtual Account", banks: ["BCA", "BNI", "Mandiri", "BRI",
+                    "BTN"
+                ] },
+            { id: "qris", name: "QRIS", icon: "fa-solid fa-qrcode", description: "Scan QR Code untuk pembayaran",
+                expiryMinutes: 5 },
+            { id: "teller", name: "Teller / Kasir", icon: "fa-solid fa-store",
+                description: "Bayar langsung di kantor cabang", locations: ["Jakarta Pusat - Jl. Merdeka No. 1",
+                    "Jakarta Selatan - Jl. Sudirman No. 2", "Jakarta Barat - Jl. Daan Mogot No. 3",
+                    "Jakarta Timur - Jl. Raya Bogor No. 4", "Jakarta Utara - Jl. Pluit No. 5"
+                ] }
+        ];
+
+        const promoBanners = [
+            { id: 1, title: "Diskon 20% Tagihan PLN!", description: "Bayar tagihan PLN dapat diskon 20% maksimal Rp50.000",
+                color: "#0D7C66" },
+            { id: 2, title: "Gratis Biaya Admin Pulsa!", description: "Isi pulsa gratis biaya admin untuk semua provider",
+                color: "#00B4A0" },
+            { id: 3, title: "Cashback Rp50.000 untuk SPP", description: "Bayar SPP minimal Rp3.000.000 dapat cashback Rp50.000",
+                color: "#0D7C66" }
+        ];
+
+        const initialTransactions = [
+            { id: "TRX-2026-001", type: "Tagihan PLN", category: "Listrik",
+                description: "Pembayaran tagihan PLN - Bapak Ahmad Subagyo", amount: 245000, status: "Sukses",
+                date: "2026-07-01 10:30:00", method: "Virtual Account - BCA", reference: "VA-20260701-001" },
+            { id: "TRX-2026-002", type: "Pulsa", category: "Pulsa", description: "Isi pulsa Telkomsel - 081234567890",
+                amount: 51000, status: "Sukses", date: "2026-07-02 14:20:00", method: "QRIS",
+                reference: "QR-20260702-001" },
+            { id: "TRX-2026-003", type: "SPP", category: "Pendidikan", description: "Registrasi - Trisya Maharani",
+                amount: 2500000, status: "Sukses", date: "2026-07-05 09:15:00", method: "Virtual Account - BNI",
+                reference: "VA-20260705-001" },
+            { id: "TRX-2026-004", type: "Tagihan PDAM", category: "Air",
+                description: "Pembayaran PDAM - Ibu Siti Rahayu", amount: 215000, status: "Sukses",
+                date: "2026-07-06 16:45:00", method: "Teller/Kasir", reference: "TL-20260706-001" },
+            { id: "TRX-2026-005", type: "Paket Data", category: "Pulsa", description: "Paket Data 5GB - Telkomsel",
+                amount: 52000, status: "Sukses", date: "2026-07-08 11:00:00", method: "Virtual Account - Mandiri",
+                reference: "VA-20260708-001" }
+        ];
+
+        // ============================================================
+        // 2. UTILITY FUNCTIONS
+        // ============================================================
+
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function generateTransactionId() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+            return `TRX-${year}${month}${day}-${random}`;
+        }
+
+        function generateVA(bank) {
+            const prefix = { 'BCA': '8860', 'BNI': '8800', 'Mandiri': '8850', 'BRI': '8880', 'BTN': '8870' };
+            const random = String(Math.floor(Math.random() * 10000000000)).padStart(10, '0');
+            return (prefix[bank] || '8800') + random;
+        }
+
+        function generatePaymentCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 12; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function getProviderByPhone(phone) {
+            if (!phone || phone.length < 4) return null;
+            const prefix = phone.substring(0, 4);
+            for (const provider of providerData) {
+                if (provider.prefix.includes(prefix)) {
+                    return provider;
+                }
+            }
+            return null;
+        }
+
+        function formatDate(dateString, withTime = true) {
+            const date = new Date(dateString);
+            const options = { day: '2-digit', month: 'long', year: 'numeric' };
+            if (withTime) { options.hour = '2-digit';
+                options.minute = '2-digit'; }
+            return date.toLocaleDateString('id-ID', options);
+        }
+
+        function getCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function validateNIM(nim) { return /^[0-9]{12}$/.test(nim); }
+
+        function validatePhone(phone) { return /^08[0-9]{8,11}$/.test(phone); }
+
+        function validatePelanggan(id) { return /^[0-9]{8,12}$/.test(id); }
+
+        function validateSeminar(id) { return /^[A-Za-z0-9-]{5,15}$/.test(id); }
+
+        function hasEnoughBalance(amount) { return AppState.user.saldo >= amount; }
+
+        function isBillPaid(bill) { return bill && bill.status === 'Lunas'; }
+
+        function generateQRData(data) { return `TRISYA_BAYAR|${data}|${Date.now()}`; }
+
+        function truncateText(text, length = 30) {
+            if (text.length <= length) return text;
+            return text.substring(0, length) + '...';
+        }
+
+        function getAppState() { return AppState; }
+
+        // ============================================================
+        // 3. APP STATE
+        // ============================================================
+
+        let AppState = {
+            user: null,
+            transactions: [],
+            settings: { darkMode: false, currentSection: 'dashboard' },
+            currentBill: null,
+            currentPayment: null,
+            selectedSPP: [],
+            selectedProvider: null,
+            selectedNominal: null,
+            selectedPaket: null
+        };
+
+        // ============================================================
+        // 4. STATE MANAGEMENT
+        // ============================================================
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('trisya_bayar_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    AppState = { ...AppState, ...parsed };
+                }
+                const transactions = localStorage.getItem('trisya_bayar_transactions');
+                if (transactions) {
+                    AppState.transactions = JSON.parse(transactions);
+                } else {
+                    AppState.transactions = [...initialTransactions];
+                    saveTransactions();
+                }
+                if (!AppState.user) { AppState.user = { ...userData }; }
+                if (AppState.settings.darkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.getElementById('themeToggle').querySelector('i').className = 'fas fa-sun';
+                }
+            } catch (e) {
+                console.error('Error loading state:', e);
+                AppState.user = { ...userData };
+                AppState.transactions = [...initialTransactions];
+                AppState.settings = { darkMode: false, currentSection: 'dashboard' };
+            }
+        }
+
+        function saveState() {
+            try {
+                const stateToSave = {
+                    user: AppState.user,
+                    settings: AppState.settings,
+                    currentSection: AppState.settings.currentSection
+                };
+                localStorage.setItem('trisya_bayar_state', JSON.stringify(stateToSave));
+            } catch (e) { console.error('Error saving state:', e); }
+        }
+
+        function saveTransactions() {
+            try {
+                localStorage.setItem('trisya_bayar_transactions', JSON.stringify(AppState.transactions));
+            } catch (e) { console.error('Error saving transactions:', e); }
+        }
+
+        // ============================================================
+        // 5. TOAST NOTIFICATION
+        // ============================================================
+
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-xmark',
+                warning: 'fa-triangle-exclamation',
+                info: 'fa-circle-info'
+            };
+            const icon = iconMap[type] || iconMap.info;
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon"><i class="fas ${icon}"></i></span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ============================================================
+        // 6. LOADING OVERLAY
+        // ============================================================
+
+        function showLoading(message = 'Memproses...') {
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.id = 'loadingOverlay';
+            overlay.innerHTML = `
+                <div class="spinner-custom"></div>
+                <p class="loading-text">${message}</p>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+
+        // ============================================================
+        // 7. MODAL
+        // ============================================================
+
+        function showModal(title, bodyHTML, footerHTML = '') {
+            const container = document.getElementById('modalContainer');
+            container.innerHTML = `
+                <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+                    <div class="modal-custom">
+                        <div class="modal-header">
+                            <span class="modal-title">${title}</span>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">${bodyHTML}</div>
+                        ${footerHTML ? `<div class="modal-footer">${footerHTML}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalContainer').innerHTML = '';
+            document.body.style.overflow = '';
+        }
+
+        // ============================================================
+        // 8. NAVIGATION
+        // ============================================================
+
+        function navigateTo(section) {
+            AppState.settings.currentSection = section;
+            saveState();
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.section === section);
+            });
+            document.querySelectorAll('.section').forEach(el => el.remove());
+            renderSection(section);
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============================================================
+        // 9. RENDER SECTION
+        // ============================================================
+
+        function renderSection(section) {
+            const container = document.getElementById('contentContainer');
+            container.innerHTML = `<div class="section active" id="section-${section}"></div>`;
+            const sectionEl = document.getElementById(`section-${section}`);
+            switch (section) {
+                case 'dashboard':
+                    renderDashboard(sectionEl);
+                    break;
+                case 'tagihan':
+                    renderTagihan(sectionEl);
+                    break;
+                case 'spp':
+                    renderSPP(sectionEl);
+                    break;
+                case 'pulsa':
+                    renderPulsa(sectionEl);
+                    break;
+                case 'riwayat':
+                    renderRiwayat(sectionEl);
+                    break;
+                default:
+                    renderDashboard(sectionEl);
+            }
+        }
+
+        // ============================================================
+        // 10. DASHBOARD
+        // ============================================================
+
+        function renderDashboard(container) {
+            const user = AppState.user;
+            const transactions = AppState.transactions;
+            const recent = transactions.slice(-3).reverse();
+
+            container.innerHTML = `
+                <div class="saldo-card">
+                    <div class="saldo-label">Saldo Anda</div>
+                    <div class="saldo-amount">${formatRupiah(user.saldo)}</div>
+                    <div class="saldo-user">👋 Halo, ${user.name}</div>
+                </div>
+                <div class="quick-access">
+                    <div class="quick-item" onclick="navigateTo('tagihan')">
+                        <div class="icon-wrap green"><i class="fas fa-file-invoice"></i></div>
+                        <span class="quick-label">Bayar Tagihan</span>
+                    </div>
+                    <div class="quick-item" onclick="navigateTo('spp')">
+                        <div class="icon-wrap teal"><i class="fas fa-graduation-cap"></i></div>
+                        <span class="quick-label">Bayar SPP</span>
+                    </div>
+                    <div class="quick-item" onclick="navigateTo('pulsa')">
+                        <div class="icon-wrap gold"><i class="fas fa-sim-card"></i></div>
+                        <span class="quick-label">Isi Pulsa</span>
+                    </div>
+                    <div class="quick-item" onclick="navigateTo('riwayat')">
+                        <div class="icon-wrap purple"><i class="fas fa-clock-rotate-left"></i></div>
+                        <span class="quick-label">Riwayat</span>
+                    </div>
+                </div>
+                <div class="promo-banner">
+                    ${promoBanners.map(banner => `
+                        <div class="promo-content" style="background:${banner.color}">
+                            <div class="promo-title">${banner.title}</div>
+                            <div class="promo-desc">${banner.description}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="card-modern">
+                    <div class="card-title">📋 Transaksi Terakhir</div>
+                    ${recent.length > 0 ? `
+                        <div style="margin-top:6px">
+                            ${recent.map(t => `
+                                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(13,124,102,0.06)">
+                                    <div style="flex:1;min-width:0">
+                                        <div style="font-weight:600;font-size:0.75rem;word-break:break-word">${truncateText(t.description, 20)}</div>
+                                        <div style="font-size:0.6rem;color:var(--text-muted)">${formatDate(t.date)}</div>
+                                    </div>
+                                    <div style="text-align:right;flex-shrink:0;margin-left:6px">
+                                        <div style="font-weight:700;font-size:0.75rem">${formatRupiah(t.amount)}</div>
+                                        <span class="status-badge ${t.status.toLowerCase()}">${t.status}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:12px 0">Belum ada transaksi</p>
+                    `}
+                    <div style="text-align:center;margin-top:6px">
+                        <button class="btn-secondary-custom" style="width:auto;padding:8px 16px;font-size:0.8rem;min-height:40px" onclick="navigateTo('riwayat')">Lihat Semua Riwayat →</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // 11. TAGIHAN
+        // ============================================================
+
+        function renderTagihan(container) {
+            const categories = [
+                { id: 'pln', name: 'PLN', icon: 'fa-bolt', color: '#F5A623' },
+                { id: 'pdam', name: 'PDAM', icon: 'fa-droplet', color: '#00B4A0' },
+                { id: 'internet', name: 'Internet', icon: 'fa-wifi', color: '#0D7C66' },
+                { id: 'seminar', name: 'Seminar/Event', icon: 'fa-users', color: '#6C2BD9' }
+            ];
+
+            container.innerHTML = `
+                <h5 style="font-weight:700;margin-bottom:12px;font-size:1rem">💳 Bayar Tagihan</h5>
+                <div class="card-modern">
+                    <div class="card-title">Pilih Kategori</div>
+                    <div class="quick-access" style="grid-template-columns:repeat(4,1fr)">
+                        ${categories.map(cat => `
+                            <div class="quick-item" onclick="showTagihanForm('${cat.id}','${cat.name}')">
+                                <div class="icon-wrap" style="background:${cat.color}"><i class="fas ${cat.icon}"></i></div>
+                                <span class="quick-label">${cat.name}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div id="tagihanFormContainer"></div>
+                <div id="tagihanResultContainer"></div>
+            `;
+        }
+
+        function showTagihanForm(category, categoryName) {
+            const container = document.getElementById('tagihanFormContainer');
+            const resultContainer = document.getElementById('tagihanResultContainer');
+            resultContainer.innerHTML = '';
+
+            let label = 'Nomor Pelanggan';
+            let placeholder = 'Masukkan nomor pelanggan';
+            let helpText = '8-12 digit angka (contoh: 123456789012)';
+            if (category === 'seminar') {
+                label = 'ID Seminar / Event';
+                placeholder = 'Masukkan ID Seminar';
+                helpText = 'contoh: SEM-2026-001 (alphanumeric)';
+            }
+
+            container.innerHTML = `
+                <div class="card-modern" style="margin-top:12px">
+                    <div class="card-title">${categoryName}</div>
+                    <form id="tagihanForm" onsubmit="cekTagihan(event, '${category}')">
+                        <div class="mb-2">
+                            <label class="form-label">${label}</label>
+                            <input type="text" class="form-control" id="tagihanInput" placeholder="${placeholder}" required style="font-size:0.95rem;padding:10px 12px" />
+                            <small style="color:var(--text-muted);font-size:0.65rem">${helpText}</small>
+                            <div class="invalid-feedback" id="tagihanError"></div>
+                        </div>
+                        <button type="submit" class="btn-primary-custom"><i class="fas fa-search"></i> Cek Tagihan</button>
+                    </form>
+                </div>
+            `;
+        }
+
+        function cekTagihan(event, category) {
+            event.preventDefault();
+            const input = document.getElementById('tagihanInput');
+            const errorEl = document.getElementById('tagihanError');
+            const value = input.value.trim();
+
+            let valid = true;
+            let errorMsg = '';
+            if (!value) { valid = false;
+                errorMsg = 'Harap masukkan nomor pelanggan'; } else if (category === 'seminar') {
+                if (!validateSeminar(value)) { valid = false;
+                    errorMsg = 'Format ID Seminar tidak valid (contoh: SEM-2026-001)'; }
+            } else {
+                if (!validatePelanggan(value)) { valid = false;
+                    errorMsg = 'Nomor pelanggan harus 8-12 digit angka'; }
+            }
+
+            if (!valid) { input.classList.add('is-invalid');
+                errorEl.textContent = errorMsg; return; }
+            input.classList.remove('is-invalid');
+            errorEl.textContent = '';
+
+            showLoading('Mencari tagihan...');
+            setTimeout(() => {
+                hideLoading();
+                let data = null;
+                let categoryDisplay = '';
+                switch (category) {
+                    case 'pln':
+                        data = plnData[value];
+                        categoryDisplay = 'PLN (Listrik)';
+                        break;
+                    case 'pdam':
+                        data = pdamData[value];
+                        categoryDisplay = 'PDAM (Air)';
+                        break;
+                    case 'internet':
+                        data = internetData[value];
+                        categoryDisplay = 'Internet';
+                        break;
+                    case 'seminar':
+                        data = seminarData[value];
+                        categoryDisplay = 'Seminar/Event';
+                        break;
+                }
+
+                const resultContainer = document.getElementById('tagihanResultContainer');
+                if (data) {
+                    if (isBillPaid(data)) {
+                        showToast('Tagihan ini sudah lunas', 'warning');
+                        resultContainer.innerHTML = `
+                            <div class="card-modern" style="border-left:4px solid var(--warning);margin-top:12px">
+                                <p style="color:var(--text-secondary);font-size:0.85rem">⚠️ Tagihan ini sudah <strong>LUNAS</strong></p>
+                                <p style="font-size:0.75rem;color:var(--text-muted)">Tidak dapat melakukan pembayaran ulang.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    AppState.currentBill = { ...data, category, categoryDisplay };
+                    showTagihanResult(resultContainer, data, category, categoryDisplay);
+                } else {
+                    showToast('Nomor pelanggan tidak ditemukan', 'error');
+                    resultContainer.innerHTML = `
+                        <div class="card-modern" style="border-left:4px solid var(--danger);margin-top:12px">
+                            <p style="color:var(--text-secondary);font-size:0.85rem">❌ Tagihan tidak ditemukan</p>
+                            <p style="font-size:0.75rem;color:var(--text-muted)">Silakan cek kembali nomor pelanggan Anda.</p>
+                        </div>
+                    `;
+                }
+            }, 1000);
+        }
+
+        function showTagihanResult(container, data, category, categoryDisplay) {
+            container.innerHTML = `
+                <div class="card-modern" style="margin-top:12px;border:2px solid var(--primary-light)">
+                    <h6 style="font-weight:700;color:var(--primary);margin-bottom:12px;font-size:0.9rem"><i class="fas fa-check-circle"></i> Detail Tagihan</h6>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.75rem">
+                        <div><strong>Kategori</strong></div><div>${categoryDisplay}</div>
+                        <div><strong>Nama Pelanggan</strong></div><div>${data.name}</div>
+                        <div><strong>Alamat</strong></div><div style="font-size:0.7rem">${truncateText(data.address, 20)}</div>
+                        <div><strong>Periode</strong></div><div>${data.period || '-'}</div>
+                        <div><strong>Tagihan Pokok</strong></div><div>${formatRupiah(data.amount)}</div>
+                        ${data.fine > 0 ? `<div><strong>Denda</strong></div><div style="color:var(--danger)">${formatRupiah(data.fine)}</div>` : ''}
+                        <div><strong style="font-size:0.9rem">Total</strong></div>
+                        <div style="font-size:1rem;font-weight:700;color:var(--primary)">${formatRupiah(data.total)}</div>
+                        <div><strong>Jatuh Tempo</strong></div><div>${data.dueDate}</div>
+                        <div><strong>Status</strong></div>
+                        <div><span class="status-badge ${data.status.toLowerCase().replace(' ','')}">${data.status}</span></div>
+                    </div>
+                    <hr style="margin:12px 0;border-color:rgba(13,124,102,0.06)">
+                    <div>
+                        <label class="form-label">Pilih Metode Pembayaran</label>
+                        <div class="payment-grid">
+                            ${paymentMethods.map(m => `
+                                <div class="payment-item" onclick="selectPayment('${m.id}')" id="payment-${m.id}">
+                                    <span class="payment-icon"><i class="${m.icon}"></i></span>
+                                    <span class="payment-name">${m.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="paymentDetail"></div>
+                        <button class="btn-primary-custom mt-sm" onclick="prosesBayarTagihan()" id="bayarTagihanBtn"><i class="fas fa-credit-card"></i> Bayar Sekarang</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectPayment(methodId) {
+            document.querySelectorAll('.payment-item').forEach(el => {
+                el.classList.toggle('selected', el.id === `payment-${methodId}`);
+            });
+            AppState.currentPayment = methodId;
+            const detailContainer = document.getElementById('paymentDetail');
+            const method = paymentMethods.find(m => m.id === methodId);
+            if (method) {
+                let detailHTML =
+                `<div style="margin-top:6px;padding:10px;background:var(--bg-primary);border-radius:var(--radius-md);font-size:0.8rem">`;
+                if (methodId === 'va') {
+                    const bank = method.banks[Math.floor(Math.random() * method.banks.length)];
+                    const va = generateVA(bank);
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">🏦 Virtual Account</p>
+                        <p style="font-size:0.8rem">Bank: <strong>${bank}</strong></p>
+                        <p style="font-size:0.8rem">Nomor VA: <strong style="color:var(--primary);font-size:0.9rem">${va}</strong></p>
+                        <p style="font-size:0.65rem;color:var(--text-muted)">Transfer ke VA di atas untuk menyelesaikan pembayaran.</p>
+                    `;
+                } else if (methodId === 'qris') {
+                    const qrData = generateQRData(AppState.currentBill.id);
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">📱 QRIS</p>
+                        <div id="qrcodeContainer" style="display:flex;justify-content:center;padding:4px"></div>
+                        <p style="font-size:0.65rem;color:var(--text-muted);text-align:center">Scan QR Code di atas untuk membayar.</p>
+                        <p style="font-size:0.65rem;color:var(--text-muted);text-align:center">⏳ Kadaluarsa dalam 5 menit</p>
+                    `;
+                    setTimeout(() => {
+                        const container = document.getElementById('qrcodeContainer');
+                        if (container && typeof QRCode !== 'undefined') {
+                            container.innerHTML = '';
+                            new QRCode(container, { text: qrData, width: 140, height: 140, colorDark: '#0D7C66',
+                                colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.H });
+                        }
+                    }, 100);
+                } else if (methodId === 'teller') {
+                    const code = generatePaymentCode();
+                    const locations = method.locations || ['Jakarta Pusat - Jl. Merdeka No. 1'];
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">🏪 Teller / Kasir</p>
+                        <p style="font-size:0.8rem">Kode Pembayaran: <strong style="color:var(--primary);font-size:0.9rem">${code}</strong></p>
+                        <p style="font-size:0.65rem;color:var(--text-muted);margin-top:4px">Lokasi Kantor:</p>
+                        <ul style="font-size:0.7rem;color:var(--text-secondary);padding-left:14px;margin-bottom:0">${locations.map(loc => `<li>${loc}</li>`).join('')}</ul>
+                    `;
+                }
+                detailHTML += `</div>`;
+                detailContainer.innerHTML = detailHTML;
+            }
+        }
+
+        function prosesBayarTagihan() {
+            const bill = AppState.currentBill;
+            const method = AppState.currentPayment;
+            if (!bill) { showToast('Silakan cek tagihan terlebih dahulu', 'warning'); return; }
+            if (!method) { showToast('Silakan pilih metode pembayaran', 'warning'); return; }
+            if (!hasEnoughBalance(bill.total)) { showToast(`Saldo tidak mencukupi. Butuh ${formatRupiah(bill.total)}`, 'error'); return; }
+
+            const methodName = paymentMethods.find(m => m.id === method)?.name || method;
+            showModal('Konfirmasi Pembayaran', `
+                <p style="font-size:0.85rem">Anda yakin ingin membayar tagihan berikut?</p>
+                <div style="background:var(--bg-primary);padding:12px;border-radius:var(--radius-md);margin:6px 0;font-size:0.85rem">
+                    <p><strong>${bill.name}</strong></p>
+                    <p style="font-size:0.75rem;color:var(--text-secondary)">${bill.address}</p>
+                    <p style="font-size:1.1rem;font-weight:700;color:var(--primary)">${formatRupiah(bill.total)}</p>
+                    <p style="font-size:0.7rem;color:var(--text-muted)">Metode: ${methodName}</p>
+                </div>
+            `, `
+                <button class="btn-secondary-custom" onclick="closeModal()" style="min-height:44px;font-size:0.85rem">Batal</button>
+                <button class="btn-primary-custom" onclick="executeTagihanPayment()" style="min-height:44px;font-size:0.85rem">Ya, Bayar</button>
+            `);
+        }
+
+        function executeTagihanPayment() {
+            closeModal();
+            const bill = AppState.currentBill;
+            const method = AppState.currentPayment;
+            const methodName = paymentMethods.find(m => m.id === method)?.name || method;
+
+            showLoading('Memproses pembayaran...');
+            setTimeout(() => {
+                hideLoading();
+                AppState.user.saldo -= bill.total;
+                const transaction = {
+                    id: generateTransactionId(),
+                    type: `Tagihan ${bill.categoryDisplay}`,
+                    category: bill.categoryDisplay,
+                    description: `Pembayaran ${bill.categoryDisplay} - ${bill.name}`,
+                    amount: bill.total,
+                    status: 'Sukses',
+                    date: getCurrentDate(),
+                    method: methodName,
+                    reference: generateTransactionId()
+                };
+                AppState.transactions.push(transaction);
+                saveTransactions();
+                saveState();
+                bill.status = 'Lunas';
+                showBuktiPembayaran(transaction, bill);
+                updateSaldo();
+                showToast('Pembayaran berhasil! 🎉', 'success');
+            }, 1500);
+        }
+
+        // ============================================================
+        // 12. SPP
+        // ============================================================
+
+        function renderSPP(container) {
+            container.innerHTML = `
+                <h5 style="font-weight:700;margin-bottom:12px;font-size:1rem">🎓 Biaya Kuliah / SPP</h5>
+                <div class="card-modern">
+                    <div class="card-title">Cek Tagihan SPP</div>
+                    <form id="sppForm" onsubmit="cekSPP(event)">
+                        <div class="mb-2">
+                            <label class="form-label">Masukkan NIM</label>
+                            <input type="text" class="form-control" id="nimInput" placeholder="Masukkan NIM (12 digit)" required style="font-size:0.95rem;padding:10px 12px" />
+                            <small style="color:var(--text-muted);font-size:0.65rem">Contoh: 202401012345</small>
+                            <div class="invalid-feedback" id="nimError"></div>
+                        </div>
+                        <button type="submit" class="btn-primary-custom"><i class="fas fa-search"></i> Lihat Tagihan Semester</button>
+                    </form>
+                </div>
+                <div id="sppResultContainer"></div>
+            `;
+        }
+
+        function cekSPP(event) {
+            event.preventDefault();
+            const input = document.getElementById('nimInput');
+            const errorEl = document.getElementById('nimError');
+            const nim = input.value.trim();
+
+            if (!nim) { input.classList.add('is-invalid');
+                errorEl.textContent = 'Harap masukkan NIM'; return; }
+            if (!validateNIM(nim)) { input.classList.add('is-invalid');
+                errorEl.textContent = 'NIM harus 12 digit angka'; return; }
+            input.classList.remove('is-invalid');
+            errorEl.textContent = '';
+
+            showLoading('Mencari data mahasiswa...');
+            setTimeout(() => {
+                hideLoading();
+                const data = sppData[nim];
+                const resultContainer = document.getElementById('sppResultContainer');
+                if (data) {
+                    AppState.selectedSPP = [];
+                    AppState.currentBill = { ...data, category: 'spp', categoryDisplay: 'SPP' };
+                    renderSPPResult(resultContainer, data);
+                } else {
+                    showToast('NIM tidak ditemukan', 'error');
+                    resultContainer.innerHTML = `
+                        <div class="card-modern" style="border-left:4px solid var(--danger);margin-top:12px">
+                            <p style="color:var(--text-secondary);font-size:0.85rem">❌ NIM tidak terdaftar</p>
+                            <p style="font-size:0.75rem;color:var(--text-muted)">Silakan cek kembali NIM Anda.</p>
+                        </div>
+                    `;
+                }
+            }, 1000);
+        }
+
+        function renderSPPResult(container, data) {
+            const tagihan = data.tagihan || [];
+            const selected = AppState.selectedSPP || [];
+
+            container.innerHTML = `
+                <div class="card-modern" style="margin-top:12px;border:2px solid var(--primary-light)">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px">
+                        <div>
+                            <h6 style="font-weight:700;color:var(--primary);font-size:0.9rem;margin-bottom:1px">${data.name}</h6>
+                            <p style="font-size:0.65rem;color:var(--text-muted);margin-bottom:0">${data.major} | NIM: ${data.nim}</p>
+                            <p style="font-size:0.65rem;color:var(--text-muted);margin-bottom:0">Semester ${data.semester}</p>
+                        </div>
+                        <div style="text-align:right">
+                            <span style="font-size:0.6rem;color:var(--text-muted)">Total Tagihan</span>
+                            <p style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0" id="sppTotal">Rp 0</p>
+                        </div>
+                    </div>
+                    <div class="spp-list">
+                        ${tagihan.map(item => `
+                            <div class="spp-item">
+                                <input type="checkbox" class="spp-check" data-id="${item.id}" data-amount="${item.amount}"
+                                    ${item.status === 'Lunas' ? 'disabled' : ''}
+                                    ${selected.includes(item.id) ? 'checked' : ''}
+                                    onchange="updateSPPTotal()" />
+                                <div class="spp-info">
+                                    <div class="spp-desc">${item.desc}</div>
+                                    <div style="font-size:0.55rem;color:var(--text-muted)">Jatuh tempo: ${item.dueDate || '-'}</div>
+                                </div>
+                                <div class="spp-amount">${formatRupiah(item.amount)}</div>
+                                <span class="spp-status ${item.status.toLowerCase()}">${item.status}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <hr style="margin:12px 0;border-color:rgba(13,124,102,0.06)">
+                    <div>
+                        <label class="form-label">Pilih Metode Pembayaran</label>
+                        <div class="payment-grid">
+                            ${paymentMethods.map(m => `
+                                <div class="payment-item" onclick="selectPaymentSPP('${m.id}')" id="payment-spp-${m.id}">
+                                    <span class="payment-icon"><i class="${m.icon}"></i></span>
+                                    <span class="payment-name">${m.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="sppPaymentDetail"></div>
+                        <button class="btn-primary-custom mt-sm" onclick="prosesBayarSPP()" id="bayarSPPBtn"><i class="fas fa-credit-card"></i> Bayar Terpilih</button>
+                    </div>
+                </div>
+            `;
+            updateSPPTotal();
+        }
+
+        function updateSPPTotal() {
+            const checkboxes = document.querySelectorAll('.spp-check:checked');
+            let total = 0;
+            checkboxes.forEach(cb => { total += parseInt(cb.dataset.amount); });
+            const totalEl = document.getElementById('sppTotal');
+            if (totalEl) { totalEl.textContent = formatRupiah(total); }
+            AppState.selectedSPP = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+        }
+
+        function selectPaymentSPP(methodId) {
+            document.querySelectorAll('.payment-item').forEach(el => {
+                el.classList.toggle('selected', el.id === `payment-spp-${methodId}`);
+            });
+            AppState.currentPayment = methodId;
+            const detailContainer = document.getElementById('sppPaymentDetail');
+            const method = paymentMethods.find(m => m.id === methodId);
+            if (method) {
+                let detailHTML =
+                `<div style="margin-top:6px;padding:10px;background:var(--bg-primary);border-radius:var(--radius-md);font-size:0.8rem">`;
+                if (methodId === 'va') {
+                    const bank = method.banks[Math.floor(Math.random() * method.banks.length)];
+                    const va = generateVA(bank);
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">🏦 Virtual Account</p>
+                        <p style="font-size:0.8rem">Bank: <strong>${bank}</strong></p>
+                        <p style="font-size:0.8rem">Nomor VA: <strong style="color:var(--primary);font-size:0.9rem">${va}</strong></p>
+                    `;
+                } else if (methodId === 'qris') {
+                    const qrData = generateQRData(`SPP-${Date.now()}`);
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">📱 QRIS</p>
+                        <div id="qrcodeSPPContainer" style="display:flex;justify-content:center;padding:4px"></div>
+                    `;
+                    setTimeout(() => {
+                        const container = document.getElementById('qrcodeSPPContainer');
+                        if (container && typeof QRCode !== 'undefined') {
+                            container.innerHTML = '';
+                            new QRCode(container, { text: qrData, width: 140, height: 140, colorDark: '#0D7C66',
+                                colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.H });
+                        }
+                    }, 100);
+                } else if (methodId === 'teller') {
+                    const code = generatePaymentCode();
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">🏪 Teller / Kasir</p>
+                        <p style="font-size:0.8rem">Kode Pembayaran: <strong style="color:var(--primary);font-size:0.9rem">${code}</strong></p>
+                    `;
+                }
+                detailHTML += `</div>`;
+                detailContainer.innerHTML = detailHTML;
+            }
+        }
+
+        function prosesBayarSPP() {
+            const selected = AppState.selectedSPP;
+            const method = AppState.currentPayment;
+            const data = AppState.currentBill;
+
+            if (!selected || selected.length === 0) { showToast('Pilih minimal satu tagihan', 'warning'); return; }
+            if (!method) { showToast('Silakan pilih metode pembayaran', 'warning'); return; }
+
+            let total = 0;
+            const tagihan = data.tagihan || [];
+            const selectedItems = [];
+            tagihan.forEach(item => {
+                if (selected.includes(item.id)) { total += item.amount;
+                    selectedItems.push(item); }
+            });
+            if (total === 0) { showToast('Tidak ada tagihan yang valid', 'warning'); return; }
+            if (!hasEnoughBalance(total)) { showToast(`Saldo tidak mencukupi. Butuh ${formatRupiah(total)}`, 'error'); return; }
+
+            const methodName = paymentMethods.find(m => m.id === method)?.name || method;
+            showModal('Konfirmasi Pembayaran SPP', `
+                <p style="font-size:0.85rem">Anda yakin ingin membayar <strong>${selectedItems.length}</strong> tagihan SPP?</p>
+                <div style="background:var(--bg-primary);padding:12px;border-radius:var(--radius-md);margin:6px 0;font-size:0.8rem">
+                    ${selectedItems.map(item => `
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(13,124,102,0.06)">
+                            <span>${item.desc}</span>
+                            <span style="font-weight:600">${formatRupiah(item.amount)}</span>
+                        </div>
+                    `).join('')}
+                    <div style="display:flex;justify-content:space-between;font-size:0.95rem;font-weight:700;color:var(--primary);padding-top:6px;border-top:2px solid var(--primary)">
+                        <span>Total</span>
+                        <span>${formatRupiah(total)}</span>
+                    </div>
+                    <p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px">Metode: ${methodName}</p>
+                </div>
+            `, `
+                <button class="btn-secondary-custom" onclick="closeModal()" style="min-height:44px;font-size:0.85rem">Batal</button>
+                <button class="btn-primary-custom" onclick="executeSPPPayment()" style="min-height:44px;font-size:0.85rem">Ya, Bayar</button>
+            `);
+        }
+
+        function executeSPPPayment() {
+            closeModal();
+            const selected = AppState.selectedSPP;
+            const method = AppState.currentPayment;
+            const data = AppState.currentBill;
+            const methodName = paymentMethods.find(m => m.id === method)?.name || method;
+
+            let total = 0;
+            const tagihan = data.tagihan || [];
+            const selectedItems = [];
+            tagihan.forEach(item => {
+                if (selected.includes(item.id)) { total += item.amount;
+                    selectedItems.push(item); }
+            });
+
+            showLoading('Memproses pembayaran SPP...');
+            setTimeout(() => {
+                hideLoading();
+                AppState.user.saldo -= total;
+                selectedItems.forEach(item => { item.status = 'Lunas';
+                    item.paidDate = getCurrentDate(); });
+                const transaction = {
+                    id: generateTransactionId(),
+                    type: 'SPP',
+                    category: 'Pendidikan',
+                    description: `Pembayaran SPP - ${data.name} (${selectedItems.length} tagihan)`,
+                    amount: total,
+                    status: 'Sukses',
+                    date: getCurrentDate(),
+                    method: methodName,
+                    reference: generateTransactionId()
+                };
+                AppState.transactions.push(transaction);
+                saveTransactions();
+                saveState();
+                showBuktiPembayaran(transaction, data);
+                updateSaldo();
+                showToast('Pembayaran SPP berhasil! 🎉', 'success');
+            }, 1500);
+        }
+
+        // ============================================================
+        // 13. PULSA
+        // ============================================================
+
+        function renderPulsa(container) {
+            container.innerHTML = `
+                <h5 style="font-weight:700;margin-bottom:12px;font-size:1rem">📱 Isi Pulsa & Paket Data</h5>
+                <div class="card-modern">
+                    <div class="card-title">Pilih Provider</div>
+                    <div class="provider-grid">
+                        ${providerData.map(p => `
+                            <div class="provider-item" onclick="selectProvider('${p.id}')" id="provider-${p.id}">
+                                <span class="provider-icon" style="color:${p.color}"><i class="${p.icon}"></i></span>
+                                <span class="provider-name">${p.name}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="pulsaFormContainer" style="display:none">
+                        <hr style="border-color:rgba(13,124,102,0.06);margin:10px 0">
+                        <div class="mb-2">
+                            <label class="form-label">Nomor HP</label>
+                            <input type="tel" class="form-control" id="phoneInput" placeholder="Masukkan nomor HP (contoh: 081234567890)" style="font-size:0.95rem;padding:10px 12px" />
+                            <div class="invalid-feedback" id="phoneError"></div>
+                        </div>
+                        <div>
+                            <label class="form-label">Pilih Nominal Pulsa</label>
+                            <div class="nominal-grid">
+                                ${pulsaNominal.map(n => `
+                                    <div class="nominal-item" onclick="selectNominal(${n.value})" id="nominal-${n.value}">
+                                        <div class="nominal-value">${n.label}</div>
+                                        <div class="nominal-price">${formatRupiah(n.price)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Atau Pilih Paket Data</label>
+                            <select class="form-control" id="paketSelect" onchange="selectPaket(this.value)" style="font-size:0.95rem;padding:10px 12px">
+                                <option value="">-- Pilih Paket Data --</option>
+                                ${paketData.map(p => `<option value="${p.id}">${p.name} - ${formatRupiah(p.price)} (${p.provider})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="pulsaPreview" style="display:none;margin-top:12px;padding:12px;background:var(--bg-primary);border-radius:var(--radius-md);font-size:0.8rem"></div>
+                        <div>
+                            <label class="form-label">Pilih Metode Pembayaran</label>
+                            <div class="payment-grid">
+                                ${paymentMethods.map(m => `
+                                    <div class="payment-item" onclick="selectPaymentPulsa('${m.id}')" id="payment-pulsa-${m.id}">
+                                        <span class="payment-icon"><i class="${m.icon}"></i></span>
+                                        <span class="payment-name">${m.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div id="pulsaPaymentDetail"></div>
+                        </div>
+                        <button class="btn-primary-custom mt-sm" onclick="prosesBayarPulsa()" id="bayarPulsaBtn"><i class="fas fa-credit-card"></i> Bayar Sekarang</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectProvider(providerId) {
+            document.querySelectorAll('.provider-item').forEach(el => {
+                el.classList.toggle('selected', el.id === `provider-${providerId}`);
+            });
+            AppState.selectedProvider = providerId;
+            document.getElementById('pulsaFormContainer').style.display = 'block';
+            AppState.selectedNominal = null;
+            document.querySelectorAll('.nominal-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById('paketSelect').value = '';
+            document.getElementById('pulsaPreview').style.display = 'none';
+        }
+
+        function selectNominal(value) {
+            document.querySelectorAll('.nominal-item').forEach(el => {
+                el.classList.toggle('selected', el.id === `nominal-${value}`);
+            });
+            AppState.selectedNominal = value;
+            AppState.selectedPaket = null;
+            document.getElementById('paketSelect').value = '';
+            updatePulsaPreview();
+        }
+
+        function selectPaket(paketId) {
+            if (!paketId) { AppState.selectedPaket = null;
+                updatePulsaPreview(); return; }
+            const paket = paketData.find(p => p.id === paketId);
+            if (paket) {
+                AppState.selectedPaket = paket;
+                AppState.selectedNominal = null;
+                document.querySelectorAll('.nominal-item').forEach(el => el.classList.remove('selected'));
+                updatePulsaPreview();
+            }
+        }
+
+        function updatePulsaPreview() {
+            const preview = document.getElementById('pulsaPreview');
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!phone) { preview.style.display = 'none'; return; }
+
+            const provider = getProviderByPhone(phone);
+            if (!provider) {
+                preview.innerHTML =
+                `<p style="color:var(--danger);font-size:0.75rem">❌ Nomor HP tidak valid atau provider tidak terdeteksi</p>`;
+                preview.style.display = 'block';
+                return;
+            }
+
+            let nominal = AppState.selectedNominal;
+            let paket = AppState.selectedPaket;
+            let price = 0;
+            let label = '';
+
+            if (nominal) {
+                const n = pulsaNominal.find(p => p.value === nominal);
+                if (n) { price = n.price;
+                    label = n.label; }
+            } else if (paket) {
+                price = paket.price;
+                label = `${paket.name} (${paket.provider})`;
+            } else {
+                preview.innerHTML =
+                `<p style="color:var(--text-muted);font-size:0.75rem">Silakan pilih nominal pulsa atau paket data</p>`;
+                preview.style.display = 'block';
+                return;
+            }
+
+            preview.innerHTML = `
+                <p style="font-weight:600;font-size:0.8rem">📋 Ringkasan</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.75rem">
+                    <span>Provider</span><span><strong>${provider.name}</strong></span>
+                    <span>Nomor Tujuan</span><span><strong>${phone}</strong></span>
+                    <span>Produk</span><span><strong>${label}</strong></span>
+                    <span style="font-size:0.95rem;font-weight:700;color:var(--primary)">Total</span>
+                    <span style="font-size:0.95rem;font-weight:700;color:var(--primary)">${formatRupiah(price)}</span>
+                </div>
+            `;
+            preview.style.display = 'block';
+        }
+
+        function selectPaymentPulsa(methodId) {
+            document.querySelectorAll('.payment-item').forEach(el => {
+                el.classList.toggle('selected', el.id === `payment-pulsa-${methodId}`);
+            });
+            AppState.currentPayment = methodId;
+            const detailContainer = document.getElementById('pulsaPaymentDetail');
+            const method = paymentMethods.find(m => m.id === methodId);
+            if (method) {
+                let detailHTML =
+                `<div style="margin-top:6px;padding:10px;background:var(--bg-primary);border-radius:var(--radius-md);font-size:0.8rem">`;
+                if (methodId === 'va') {
+                    const bank = method.banks[Math.floor(Math.random() * method.banks.length)];
+                    const va = generateVA(bank);
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">🏦 Virtual Account</p>
+                        <p style="font-size:0.8rem">Bank: <strong>${bank}</strong></p>
+                        <p style="font-size:0.8rem">Nomor VA: <strong style="color:var(--primary);font-size:0.9rem">${va}</strong></p>
+                    `;
+                } else if (methodId === 'qris') {
+                    const qrData = generateQRData(`PULSA-${Date.now()}`);
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">📱 QRIS</p>
+                        <div id="qrcodePulsaContainer" style="display:flex;justify-content:center;padding:4px"></div>
+                    `;
+                    setTimeout(() => {
+                        const container = document.getElementById('qrcodePulsaContainer');
+                        if (container && typeof QRCode !== 'undefined') {
+                            container.innerHTML = '';
+                            new QRCode(container, { text: qrData, width: 140, height: 140, colorDark: '#0D7C66',
+                                colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.H });
+                        }
+                    }, 100);
+                } else if (methodId === 'teller') {
+                    const code = generatePaymentCode();
+                    detailHTML += `
+                        <p style="font-weight:600;font-size:0.8rem">🏪 Teller / Kasir</p>
+                        <p style="font-size:0.8rem">Kode Pembayaran: <strong style="color:var(--primary);font-size:0.9rem">${code}</strong></p>
+                    `;
+                }
+                detailHTML += `</div>`;
+                detailContainer.innerHTML = detailHTML;
+            }
+        }
+
+        function prosesBayarPulsa() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            const providerId = AppState.selectedProvider;
+            const nominal = AppState.selectedNominal;
+            const paket = AppState.selectedPaket;
+            const method = AppState.currentPayment;
+
+            if (!providerId) { showToast('Pilih provider terlebih dahulu', 'warning'); return; }
+            if (!phone) { showToast('Masukkan nomor HP', 'warning'); return; }
+            if (!validatePhone(phone)) { showToast('Nomor HP tidak valid (10-13 digit, awalan 08)', 'error'); return; }
+            const provider = getProviderByPhone(phone);
+            if (!provider || provider.id !== providerId) {
+                showToast(`Provider tidak sesuai. Gunakan ${providerData.find(p => p.id === providerId)?.name || ''}`, 'error');
+                return;
+            }
+            if (!nominal && !paket) { showToast('Pilih nominal pulsa atau paket data', 'warning'); return; }
+            if (!method) { showToast('Pilih metode pembayaran', 'warning'); return; }
+
+            let price = 0,
+                label = '';
+            if (nominal) { const n = pulsaNominal.find(p => p.value === nominal); if (n) { price = n.price;
+                    label = n.label; } } else if (paket) { price = paket.price;
+                label = `${paket.name} (${paket.provider})`; }
+            if (price === 0) { showToast('Terjadi kesalahan, silakan coba lagi', 'error'); return; }
+            if (!hasEnoughBalance(price)) { showToast(`Saldo tidak mencukupi. Butuh ${formatRupiah(price)}`, 'error'); return; }
+
+            const methodName = paymentMethods.find(m => m.id === method)?.name || method;
+            showModal('Konfirmasi Pembelian Pulsa', `
+                <p style="font-size:0.85rem">Anda yakin ingin membeli pulsa berikut?</p>
+                <div style="background:var(--bg-primary);padding:12px;border-radius:var(--radius-md);margin:6px 0;font-size:0.85rem">
+                    <p><strong>${provider.name}</strong></p>
+                    <p style="font-size:0.75rem;color:var(--text-secondary)">Nomor: ${phone}</p>
+                    <p style="font-size:0.75rem;color:var(--text-secondary)">Produk: ${label}</p>
+                    <p style="font-size:1.1rem;font-weight:700;color:var(--primary)">${formatRupiah(price)}</p>
+                    <p style="font-size:0.7rem;color:var(--text-muted)">Metode: ${methodName}</p>
+                </div>
+            `, `
+                <button class="btn-secondary-custom" onclick="closeModal()" style="min-height:44px;font-size:0.85rem">Batal</button>
+                <button class="btn-primary-custom" onclick="executePulsaPayment()" style="min-height:44px;font-size:0.85rem">Ya, Bayar</button>
+            `);
+        }
+
+        function executePulsaPayment() {
+            closeModal();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const providerId = AppState.selectedProvider;
+            const nominal = AppState.selectedNominal;
+            const paket = AppState.selectedPaket;
+            const method = AppState.currentPayment;
+            const methodName = paymentMethods.find(m => m.id === method)?.name || method;
+
+            let price = 0,
+                label = '',
+                productType = 'Pulsa';
+            if (nominal) { const n = pulsaNominal.find(p => p.value === nominal); if (n) { price = n.price;
+                    label = n.label; } } else if (paket) { price = paket.price;
+                label = `${paket.name} (${paket.provider})`;
+                productType = 'Paket Data'; }
+            const provider = providerData.find(p => p.id === providerId);
+
+            showLoading(`Memproses pembelian ${productType}...`);
+            setTimeout(() => {
+                hideLoading();
+                AppState.user.saldo -= price;
+                const transaction = {
+                    id: generateTransactionId(),
+                    type: productType,
+                    category: 'Pulsa',
+                    description: `${productType} ${provider?.name || ''} - ${phone} (${label})`,
+                    amount: price,
+                    status: 'Sukses',
+                    date: getCurrentDate(),
+                    method: methodName,
+                    reference: generateTransactionId()
+                };
+                AppState.transactions.push(transaction);
+                saveTransactions();
+                saveState();
+                showBuktiPembayaran(transaction, { name: `${provider?.name || ''} - ${phone}`, total: price });
+                updateSaldo();
+                showToast(`Pembelian ${productType} berhasil! 🎉`, 'success');
+            }, 1500);
+        }
+
+        // ============================================================
+        // 14. RIWAYAT
+        // ============================================================
+
+        function renderRiwayat(container) {
+            const transactions = AppState.transactions || [];
+
+            container.innerHTML = `
+                <h5 style="font-weight:700;margin-bottom:12px;font-size:1rem">📜 Riwayat Transaksi</h5>
+                <div class="card-modern">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <label class="form-label" style="margin-bottom:0;font-size:0.7rem">Filter</label>
+                            <select class="form-control" style="width:auto;display:inline-block;padding:4px 8px;font-size:0.7rem;min-height:32px" id="filterStatus" onchange="filterRiwayat()">
+                                <option value="all">Semua</option>
+                                <option value="sukses">Sukses</option>
+                                <option value="gagal">Gagal</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <span style="font-size:0.7rem;color:var(--text-muted)">${transactions.length} transaksi</span>
+                            ${transactions.length > 0 ? `
+                                <button class="btn-danger-custom" style="width:auto;padding:4px 10px;font-size:0.65rem;min-height:32px" onclick="clearHistory()"><i class="fas fa-trash"></i></button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div id="riwayatList" class="card-modern" style="padding:10px">
+                    ${transactions.length > 0 ? `
+                        <div style="overflow-x:auto;margin:-4px">
+                            <table class="table-modern">
+                                <thead><tr><th>#</th><th>Tanggal</th><th>Deskripsi</th><th>Jumlah</th><th>Status</th></tr></thead>
+                                <tbody id="riwayatBody">
+                                    ${transactions.slice().reverse().map((t, index) => `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td style="font-size:0.6rem">${formatDate(t.date, true)}</td>
+                                            <td style="font-size:0.65rem;max-width:80px;word-break:break-word">${truncateText(t.description, 16)}</td>
+                                            <td style="font-weight:600;font-size:0.7rem">${formatRupiah(t.amount)}</td>
+                                            <td><span class="status-badge ${t.status.toLowerCase()}">${t.status}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : `
+                        <p style="text-align:center;color:var(--text-muted);padding:20px 0;font-size:0.85rem">
+                            <i class="fas fa-inbox" style="font-size:1.3rem;display:block;margin-bottom:8px"></i>Belum ada transaksi
+                        </p>
+                    `}
+                </div>
+                ${transactions.length > 0 ? `
+                    <div class="card-modern" style="margin-top:12px">
+                        <div class="card-title">📊 Statistik Pengeluaran</div>
+                        <canvas id="expenseChart" style="max-height:180px;width:100%"></canvas>
+                    </div>
+                ` : ''}
+            `;
+
+            if (transactions.length > 0) {
+                setTimeout(() => renderChart(transactions), 100);
+            }
+        }
+
+        function filterRiwayat() {
+            const filter = document.getElementById('filterStatus').value;
+            const rows = document.querySelectorAll('#riwayatBody tr');
+            rows.forEach(row => {
+                const status = row.querySelector('.status-badge')?.textContent?.toLowerCase() || '';
+                row.style.display = (filter === 'all' || status === filter) ? '' : 'none';
+            });
+        }
+
+        function clearHistory() {
+            if (AppState.transactions.length === 0) return;
+            showModal('Hapus Riwayat', `
+                <p style="font-size:0.85rem">Anda yakin ingin menghapus semua riwayat transaksi?</p>
+                <p style="font-size:0.75rem;color:var(--text-muted)">Tindakan ini tidak dapat dibatalkan.</p>
+            `, `
+                <button class="btn-secondary-custom" onclick="closeModal()" style="min-height:44px;font-size:0.85rem">Batal</button>
+                <button class="btn-danger-custom" onclick="executeClearHistory()" style="min-height:44px;font-size:0.85rem">Ya, Hapus Semua</button>
+            `);
+        }
+
+        function executeClearHistory() {
+            closeModal();
+            AppState.transactions = [];
+            saveTransactions();
+            renderRiwayat(document.getElementById('contentContainer'));
+            showToast('Riwayat berhasil dihapus', 'info');
+        }
+
+        function renderChart(transactions) {
+            const canvas = document.getElementById('expenseChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            const monthlyData = {};
+            transactions.forEach(t => {
+                const date = new Date(t.date);
+                const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!monthlyData[month]) monthlyData[month] = 0;
+                monthlyData[month] += t.amount;
+            });
+
+            const sortedMonths = Object.keys(monthlyData).sort();
+            const labels = sortedMonths.map(m => {
+                const [year, month] = m.split('-');
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                return `${monthNames[parseInt(month) - 1]} ${year}`;
+            });
+            const data = sortedMonths.map(m => monthlyData[m]);
+
+            new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pengeluaran',
+                        data: data,
+                        backgroundColor: 'rgba(13, 124, 102, 0.6)',
+                        borderColor: '#0D7C66',
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue(
+                                    '--text-secondary') || '#4A5A6A',
+                                font: { size: 9 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) { return formatRupiah(value); },
+                                color: getComputedStyle(document.documentElement).getPropertyValue(
+                                    '--text-muted') || '#8A9AAA',
+                                font: { size: 8 }
+                            },
+                            grid: { color: 'rgba(13, 124, 102, 0.06)' }
+                        },
+                        x: {
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue(
+                                    '--text-muted') || '#8A9AAA',
+                                font: { size: 8 }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // 15. BUKTI PEMBAYARAN
+        // ============================================================
+
+        function showBuktiPembayaran(transaction, bill) {
+            const method = transaction.method || 'Virtual Account';
+            const date = formatDate(transaction.date, true);
+
+            showModal('✅ Bukti Pembayaran', `
+                <div id="strukContent" style="font-size:0.8rem">
+                    <div style="text-align:center;margin-bottom:12px">
+                        <h4 style="font-weight:800;color:var(--primary);font-size:1rem">💳 Trisya_Bayar</h4>
+                        <p style="font-size:0.65rem;color:var(--text-muted)">──────────────────</p>
+                        <p style="font-weight:600;font-size:0.75rem">BUKTI TRANSAKSI</p>
+                        <p style="font-size:0.6rem;color:var(--text-muted)">${transaction.id}</p>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:0.75rem">
+                        <span style="color:var(--text-muted)">Tanggal</span>
+                        <span style="font-weight:500">${date}</span>
+                        <span style="color:var(--text-muted)">Deskripsi</span>
+                        <span style="font-weight:500">${transaction.description}</span>
+                        <span style="color:var(--text-muted)">Metode</span>
+                        <span style="font-weight:500">${method}</span>
+                        <span style="color:var(--text-muted)">Referensi</span>
+                        <span style="font-weight:500">${transaction.reference || '-'}</span>
+                    </div>
+                    <div style="text-align:center;margin:12px 0;padding:12px;background:var(--bg-primary);border-radius:var(--radius-md)">
+                        <span style="font-size:0.65rem;color:var(--text-muted)">Total Pembayaran</span>
+                        <div style="font-size:1.4rem;font-weight:800;color:var(--primary)">${formatRupiah(transaction.amount)}</div>
+                    </div>
+                    <div style="text-align:center;font-size:0.6rem;color:var(--text-muted)">
+                        <p>──────────────────</p>
+                        <p>Terima kasih telah menggunakan Trisya_Bayar</p>
+                        <p>Status: <span style="color:var(--success);font-weight:600">✓ LUNAS</span></p>
+                    </div>
+                </div>
+            `, `
+                <button class="btn-secondary-custom" onclick="window.print()" style="min-height:44px;font-size:0.8rem"><i class="fas fa-print"></i> Print Struk</button>
+                <button class="btn-primary-custom" onclick="closeModal();navigateTo('riwayat')" style="min-height:44px;font-size:0.8rem"><i class="fas fa-check"></i> Selesai</button>
+            `);
+        }
+
+        // ============================================================
+        // 16. UPDATE SALDO
+        // ============================================================
+
+        function updateSaldo() {
+            const saldoEl = document.getElementById('saldoDisplay');
+            if (saldoEl) { saldoEl.textContent = formatRupiah(AppState.user.saldo); }
+        }
+
+        // ============================================================
+        // 17. THEME TOGGLE
+        // ============================================================
+
+        function initThemeToggle() {
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (isDark) {
+                    document.documentElement.removeAttribute('data-theme');
+                    document.getElementById('themeToggle').querySelector('i').className = 'fas fa-moon';
+                    AppState.settings.darkMode = false;
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.getElementById('themeToggle').querySelector('i').className = 'fas fa-sun';
+                    AppState.settings.darkMode = true;
+                }
+                saveState();
+            });
+        }
+
+        // ============================================================
+        // 18. NAVIGATION INIT
+        // ============================================================
+
+        function initNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    navigateTo(item.dataset.section);
+                });
+            });
+            const savedSection = AppState.settings.currentSection || 'dashboard';
+            navigateTo(savedSection);
+        }
+
+        // ============================================================
+        // 19. PROFILE
+        // ============================================================
+
+        function initProfile() {
+            document.getElementById('profileBtn').addEventListener('click', () => {
+                const user = AppState.user;
+                showModal('👤 Profil Saya', `
+                    <div style="text-align:center;margin-bottom:12px">
+                        <img src="${user.profileImage}" alt="Profile" style="width:64px;height:64px;border-radius:50%;border:3px solid var(--primary)" />
+                        <h5 style="margin-top:4px;font-weight:700;font-size:0.95rem">${user.name}</h5>
+                        <p style="font-size:0.75rem;color:var(--text-muted)">${user.major}</p>
+                        <p style="font-size:0.75rem;color:var(--text-muted)">NIM: ${user.nim}</p>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.75rem;padding:8px;background:var(--bg-primary);border-radius:var(--radius-md)">
+                        <span style="color:var(--text-muted)">Email</span>
+                        <span>${user.email}</span>
+                        <span style="color:var(--text-muted)">Semester</span>
+                        <span>${user.semester}</span>
+                        <span style="color:var(--text-muted)">Saldo</span>
+                        <span style="font-weight:700;color:var(--primary)">${formatRupiah(user.saldo)}</span>
+                    </div>
+                `, `
+                    <button class="btn-primary-custom" onclick="closeModal()" style="min-height:44px;font-size:0.85rem">Tutup</button>
+                `);
+            });
+        }
+
+        // ============================================================
+        // 20. INITIALIZATION
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadState();
+            updateSaldo();
+            initThemeToggle();
+            initNavigation();
+            initProfile();
+
+            document.addEventListener('input', function(e) {
+                if (e.target.id === 'phoneInput') {
+                    updatePulsaPreview();
+                }
+            });
+
+            console.log('💳 Trisya_Bayar initialized successfully! (Mobile-First)');
+            console.log(`👋 Welcome, ${AppState.user.name}`);
+            console.log(`💰 Saldo: ${formatRupiah(AppState.user.saldo)}`);
+            console.log(`📊 Total transactions: ${AppState.transactions.length}`);
+        });
+    </script>
+</body>
+</html>
+
+
